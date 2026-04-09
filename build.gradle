@@ -1,0 +1,105 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version "$springbootVersion"
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.softeq.gradle.itest' version '1.0.4'
+	id 'java-test-fixtures'
+}
+
+group = 'com.tech-showcase'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+//	implementation 'org.springframework.boot:spring-boot-h2console'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-liquibase' // new module added in springboot 4
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation "org.mapstruct:mapstruct:$mapstructVersion" // use double quote so that string interpolation can work.
+	implementation "org.liquibase:liquibase-core:$liquibaseVersion"
+	implementation "org.springframework.boot:spring-boot-docker-compose:$dockerComposeVersion"
+
+	compileOnly 'org.projectlombok:lombok'
+//	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation 'org.hamcrest:hamcrest:2.2'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api'
+	testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+//	itestImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+//	itestImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+//	itestImplementation 'org.springframework.boot:spring-boot-starter-liquibase-test'
+//	itestImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir("$buildDir/generated/src/main/java")
+		}
+	}
+	itest {
+		java {
+			srcDir "$buildDir/generated/src/main/java"
+			srcDir 'src/itest/java'
+		}
+		resources {
+			srcDir 'src/itest/resources'
+		}
+	}
+}
+
+// configure integration test setup https://softeq.github.io/itest-gradle-plugin/
+integrationTest {
+	useJUnitPlatform()
+}
+// configure processItestResources task to avoid Entry application-itest.yaml is a duplicate but no duplicate handling strategy has been set
+tasks.named("processItestResources") {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// compileClasspath = sourceSets.test.compileClasspath
+//This tells Gradle: "when compiling the itest source set, use the same classpath as the test source set."
+//sourceSets.test.compileClasspath includes:
+// All implementation and compileOnly dependencies from main
+// All testImplementation and testCompileOnly dependencies
+// Compiled classes from main output
+// So itest classes get access to everything the regular unit tests can see at compile time —  like Spring Boot Test,
+// Mockito, JUnit, etc. — without having to redeclare those dependencies for itest.
+
+// runtimeClasspath = sourceSets.test.runtimeClasspath -- Same idea but for runtime
+// The alternative would be declaring separate itestImplementation and itestRuntimeOnly
+itestSourceSet {
+	compileClasspath = sourceSets.test.compileClasspath
+	runtimeClasspath = sourceSets.test.runtimeClasspath
+}
+tasks.named('test') {
+	useJUnitPlatform()
+}
