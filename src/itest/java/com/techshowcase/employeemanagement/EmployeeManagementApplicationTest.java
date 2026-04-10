@@ -12,8 +12,11 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("itest")
 @AutoConfigureMockMvc
-@Transactional // after each test class transaction is rolledback which gives clean db for the next test
+
+// @Transactional is important — the DB stays running across tests, and @Transactional ensures each
+// test's data is rolled back so the next test gets a clean state.
 // https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/tx.html#testcontext-tx-enabling-transactions
+@Transactional
 public abstract class EmployeeManagementApplicationTest {
 
     @Autowired

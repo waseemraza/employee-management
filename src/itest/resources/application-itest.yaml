@@ -14,7 +14,9 @@ spring:
   docker:
     compose:
       enabled: true
-      file: compose.yaml
+      file: compose-itest.yaml
       lifecycle-management: start-and-stop  # explicitly set this
+      stop:
+        command: down  # removes containers (and tmpfs data) after tests
       skip:
         in-tests: false  # ensure it's not skipped
