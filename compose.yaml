@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:18
+    restart: always
+    environment:
+      POSTGRES_DB: employee-management
+      POSTGRES_USER: employee-management
+      POSTGRES_PASSWORD: Secret123
+      # PGDATA: /var/lib/postgresql/custom_path # use this if you want to override postgres default volume (data) path
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql # default path required by postgres 18+ container
+
+volumes:
+  postgres_data:

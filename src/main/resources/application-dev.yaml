@@ -1,0 +1,18 @@
+spring:
+  datasource:
+#    url: jdbc:h2:mem:testdb
+#    driver-class-name: org.h2.Driver
+#    username: sa
+    url: jdbc:postgresql://localhost:5432/employee-management
+    driver-class-name: org.postgresql.Driver
+    username: employee-management
+    password: Secret123
+
+#  h2:
+#    console:
+#      enabled: true
+
+  docker:
+    compose:
+      enabled: true
+      file: compose.yaml

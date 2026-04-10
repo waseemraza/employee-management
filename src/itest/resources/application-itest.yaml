@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    #    url: jdbc:h2:mem:testdb
+    #    driver-class-name: org.h2.Driver
+    #    username: sa
+    url: jdbc:postgresql://localhost:5432/employee-management
+    driver-class-name: org.postgresql.Driver
+    username: employee-management
+    password: Secret123
+
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.xml
+
+  docker:
+    compose:
+      enabled: true
+      file: compose.yaml
+      lifecycle-management: start-and-stop  # explicitly set this
+      skip:
+        in-tests: false  # ensure it's not skipped

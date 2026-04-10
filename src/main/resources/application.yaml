@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: employee-management
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.xml
+    enabled: true
+    default-schema: public

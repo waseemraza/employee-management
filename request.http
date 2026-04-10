@@ -1,0 +1,36 @@
+###
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+
+{
+  "employeeCode": "code-123",
+  "name": "Raza",
+  "email": "test@test.com",
+  "department": "Sales",
+  "salary": 6000,
+  "dateOfJoining": "2026-04-01T00:00:00Z",
+  "createdAt": "2026-03-15T09:00:00Z",
+  "updatedAt": "2026-03-15T09:00:00Z"
+}
+
+###
+GET http://localhost:8080/api/v1/employees
+
+###
+GET http://localhost:8080/api/v1/employees?department=Sales&page=0&size=1
+
+###
+PUT http://localhost:8080/api/v1/employees/24
+Content-Type: application/json
+
+{
+  "id": 1,
+  "employeeCode": "code-123",
+  "name": "Mohammad Waseem",
+  "email": "test@test.com",
+  "department": "IT",
+  "salary": 5000,
+  "dateOfJoining": "2026-04-01",
+  "createdAt": "2026-03-15T09:00:00Z",
+  "updatedAt": "2026-03-15T09:00:00Z"
+}
