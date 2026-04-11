@@ -1,0 +1,16 @@
+# compose.yaml file is used to run db before starting the application with dev profile. It uses a volume.
+# That means previously saved data will be available after each startup.
+# This will create problem with integration tests. We want to have clean db before each integraton test run.
+# This compose file is used for integration test. Data is stored in container memory.
+services:
+  db:
+    image: postgres:18
+    restart: "no"
+    environment:
+      POSTGRES_DB: employee-management
+      POSTGRES_USER: employee-management
+      POSTGRES_PASSWORD: Secret123
+    ports:
+      - "5432:5432"
+    tmpfs: # Data is stored in container memory
+      - /var/lib/postgresql
