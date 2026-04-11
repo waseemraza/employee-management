@@ -20,19 +20,6 @@ public class EmployeeController {
 
     private EmployeeService employeeService;
 
-    @PostMapping(value = "/api/v1/employees")
-    public ResponseEntity<EmployeeResponseDto> createEmployee(
-            @Valid @RequestBody final EmployeeRequestDto employeeRequestDto,
-            final UriComponentsBuilder uriBuilder) {
-
-        final EmployeeResponseDto savedEmployee = employeeService.createEmployee(employeeRequestDto);
-
-        final URI uri = uriBuilder.path("/api/v1/employees/{id}")
-                .buildAndExpand(savedEmployee.getId())
-                .toUri();
-        return ResponseEntity.created(uri).body(savedEmployee);
-    }
-
     @GetMapping("/api/v1/employees")
     public Page<EmployeeResponseDto> searchEmployees(final EmployeeSearchParamsDto searchParams,
                                                      final Pageable pageable) {

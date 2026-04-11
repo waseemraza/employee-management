@@ -1,9 +1,10 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version "$springbootVersion"
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.softeq.gradle.itest' version '1.0.4'
-	id 'java-test-fixtures'
+    id 'java'
+    id 'org.springframework.boot' version "$springbootVersion"
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.softeq.gradle.itest' version '1.0.4'
+    id 'java-test-fixtures'
+    id 'org.openapi.generator' version "$openApiVersion"
 }
 
 group = 'com.tech-showcase'
@@ -11,47 +12,58 @@ version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    // lombok annotation processor should come before MapStruct one.
+    // MapStruct’s view of your beans includes the Lombok-generated accessors, not just the raw fields
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 //	implementation 'org.springframework.boot:spring-boot-h2console'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-liquibase' // new module added in springboot 4
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-liquibase' // new module added in springboot 4
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-	implementation "org.mapstruct:mapstruct:$mapstructVersion" // use double quote so that string interpolation can work.
-	implementation "org.liquibase:liquibase-core:$liquibaseVersion"
-	implementation "org.springframework.boot:spring-boot-docker-compose:$dockerComposeVersion"
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation "org.mapstruct:mapstruct:$mapstructVersion" // use double quote so that string interpolation can work.
+    implementation "org.liquibase:liquibase-core:$liquibaseVersion"
+    implementation "org.springframework.boot:spring-boot-docker-compose:$dockerComposeVersion"
 
-	compileOnly 'org.projectlombok:lombok'
+    // openapi
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiStarterVersion"
+
+    // Required for openapi generated code
+    implementation "io.swagger.core.v3:swagger-annotations:$swaggerAnnotationVersion"
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.9'
+    implementation 'jakarta.validation:jakarta.validation-api'
+    implementation 'jakarta.annotation:jakarta.annotation-api'
+
+    implementation 'org.projectlombok:lombok'
 //	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testImplementation 'org.hamcrest:hamcrest:2.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api'
-	testImplementation 'org.junit.jupiter:junit-jupiter-engine'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 //	itestImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 //	itestImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
@@ -60,29 +72,31 @@ dependencies {
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir("$buildDir/generated/src/main/java")
-		}
-	}
-	itest {
-		java {
-			srcDir "$buildDir/generated/src/main/java"
-			srcDir 'src/itest/java'
-		}
-		resources {
-			srcDir 'src/itest/resources'
-		}
-	}
+    main {
+        java {
+            // Add generated sources (mapstruct, openapi generated) to source set
+            srcDir("$buildDir/generated/src/main/java")
+        }
+    }
+    itest {
+        java {
+            // Do not add generated OpenAPI sources here: they are compiled in `main` with Lombok/MapStruct.
+            // Recompiling them into itest/classes shadows main and causes NoSuchMethodError (e.g. missing .builder()).
+            srcDir 'src/itest/java'
+        }
+        resources {
+            srcDir 'src/itest/resources'
+        }
+    }
 }
 
 // configure integration test setup https://softeq.github.io/itest-gradle-plugin/
 integrationTest {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 // configure processItestResources task to avoid Entry application-itest.yaml is a duplicate but no duplicate handling strategy has been set
 tasks.named("processItestResources") {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // compileClasspath = sourceSets.test.compileClasspath
@@ -97,9 +111,41 @@ tasks.named("processItestResources") {
 // runtimeClasspath = sourceSets.test.runtimeClasspath -- Same idea but for runtime
 // The alternative would be declaring separate itestImplementation and itestRuntimeOnly
 itestSourceSet {
-	compileClasspath = sourceSets.test.compileClasspath
-	runtimeClasspath = sourceSets.test.runtimeClasspath
+    compileClasspath = sourceSets.test.compileClasspath
+    runtimeClasspath = sourceSets.test.runtimeClasspath
 }
+
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec.set("$rootDir/openapi/employee-oas.yaml") // path to spec file
+	outputDir.set(layout.buildDirectory.dir("generated").get().asFile.path)
+	apiPackage.set("com.techshowcase.api")
+	modelPackage = "com.techshowcase.api.model"
+	modelNameSuffix.set("Dto")
+    importMappings = [
+            'Instant': 'java.time.Instant'
+    ]
+    typeMappings = [
+            'DateTime': 'Instant' // without this mapping openapi will generate the date-time field of type OffsetDateTime
+    ]
+    configOptions = [
+            interfaceOnly : "true",  // generates interfaces to implement them
+            useSpringBoot3: "true",  // required for Spring Boot 3+/4
+            useTags       : "true",
+            dateLibrary   : "java8",
+            library       : "spring-boot",
+            additionalModelTypeAnnotations: '@lombok.Builder(toBuilder = true)  @lombok.AllArgsConstructor @lombok.extern.jackson.Jacksonized',
+            generatedConstructorWithRequiredArgs: "false"
+    ]
+}
+// Make sure code is generated before compilation
+tasks.named('compileJava') {
+    dependsOn tasks.named('openApiGenerate')
+}
+tasks.named('compileItestJava') {
+    dependsOn tasks.named('openApiGenerate')
 }

@@ -1,10 +1,9 @@
 package com.techshowcase.employeemanagement.service;
 
-import com.techshowcase.employeemanagement.dto.EmployeeRequestDto;
-import com.techshowcase.employeemanagement.dto.EmployeeResponseDto;
+import com.techshowcase.api.model.CreateEmployeeRequestDto;
+import com.techshowcase.api.model.CreateEmployeeResponseDto;
 import com.techshowcase.employeemanagement.dto.EmployeeSearchParamsDto;
 import com.techshowcase.employeemanagement.entity.Employee;
-import com.techshowcase.employeemanagement.exception.ResourceNotFoundException;
 import com.techshowcase.employeemanagement.mapper.EmployeeMapper;
 import com.techshowcase.employeemanagement.repository.EmployeeRepository;
 import com.techshowcase.employeemanagement.repository.EmployeeSpecification;
@@ -14,23 +13,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-
 @Service
 @Transactional // aop transaction management
 @RequiredArgsConstructor
-public class EmployeeService {
+public class EmployeeService2 {
 
     private final EmployeeRepository employeeRepository;
-    private final EmployeeMapper mapper; // replace manual mapping with mapstruct lib
+    private final EmployeeMapper mapper;
 
-    public Page<EmployeeResponseDto> searchEmployees(final EmployeeSearchParamsDto searchParams,
-                                                     final Pageable pageable) {
-        return employeeRepository.findAll(EmployeeSpecification.fromSearchParams(searchParams), pageable)
-                .map(mapper::mapToResponseDto);
+    public CreateEmployeeResponseDto createEmployee(final CreateEmployeeRequestDto employeeRequestDto) {
+        final Employee employee = mapper.mapRequestDtoToEmployee(employeeRequestDto);
+        final Employee savedEmployee = employeeRepository.save(employee);
+        return mapper.mapEmployeeToResponseDto(savedEmployee);
     }
 
-    public EmployeeResponseDto updateEmployee(final Long id, final EmployeeRequestDto requestDto) {
+    public Page<CreateEmployeeResponseDto> searchEmployees(final EmployeeSearchParamsDto searchParams,
+                                                           final Pageable pageable) {
+        return employeeRepository.findAll(EmployeeSpecification.fromSearchParams(searchParams), pageable)
+                .map(mapper::mapEmployeeToResponseDto);
+    }
+
+    /*public EmployeeResponseDto updateEmployee(final Long id, final EmployeeRequestDto requestDto) {
         final Employee existing = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
 
@@ -46,6 +49,6 @@ public class EmployeeService {
                 .updatedAt(Instant.now())
                 .build();
         final Employee saved = employeeRepository.save(updated);
-        return mapper.mapToResponseDto(saved);
-    }
+        return mapper.mapEmployeeToResponseDto(saved);
+    }*/
 }

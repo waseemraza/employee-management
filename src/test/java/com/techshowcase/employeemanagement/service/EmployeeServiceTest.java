@@ -1,14 +1,14 @@
 package com.techshowcase.employeemanagement.service;
 
-import com.techshowcase.employeemanagement.EmployeeTestDataHelper;
-import com.techshowcase.employeemanagement.dto.EmployeeRequestDto;
-import com.techshowcase.employeemanagement.dto.EmployeeResponseDto;
+import com.techshowcase.api.model.CreateEmployeeRequestDto;
+import com.techshowcase.api.model.CreateEmployeeResponseDto;
 import com.techshowcase.employeemanagement.entity.Employee;
-import com.techshowcase.employeemanagement.mapper.EmployeeMapper;
+import com.techshowcase.employeemanagement.mapper.EmployeeMapperImpl;
 import com.techshowcase.employeemanagement.repository.EmployeeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -26,45 +26,39 @@ public class EmployeeServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
 
-    @Mock
-    private EmployeeMapper mapper;
+    private EmployeeService2 employeeService;
 
-    @InjectMocks
-    private EmployeeService employeeService;
+    @BeforeEach
+    public void setup() {
+        employeeService = new EmployeeService2(employeeRepository, new EmployeeMapperImpl());
+    }
 
     @Test
     void testCreateEmployee_Success() {
+        final Instant now = Instant.now();
+        final CreateEmployeeRequestDto requestDto = new CreateEmployeeRequestDto();
+        requestDto.setName("John Doe");
+        requestDto.setEmployeeCode("EMP001");
+        requestDto.setEmail("john@example.com");
+        requestDto.setDepartment("Engineering");
+        requestDto.setSalary(BigDecimal.valueOf(50000));
+        requestDto.setDateOfJoining(now);
 
-        final EmployeeRequestDto requestDto = EmployeeTestDataHelper.getEmployeeRequestDto();
-        final Employee employee = EmployeeTestDataHelper.getEmployee();
-
-        Employee savedEmployee = Employee.builder()
+        final Employee savedEmployee = Employee.builder()
                 .id(1L)
                 .employeeCode("EMP001")
                 .name("John Doe")
                 .email("john@example.com")
                 .department("Engineering")
                 .salary(BigDecimal.valueOf(50000))
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .dateOfJoining(now)
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
-        EmployeeResponseDto responseDto = EmployeeResponseDto.builder()
-                .id(1L)
-                .employeeCode("EMP001")
-                .name("John Doe")
-                .email("john@example.com")
-                .department("Engineering")
-                .salary(BigDecimal.valueOf(50000))
-                .createdAt(savedEmployee.getCreatedAt())
-                .updatedAt(savedEmployee.getUpdatedAt())
-                .build();
+        when(employeeRepository.save(ArgumentMatchers.any(Employee.class))).thenReturn(savedEmployee);
 
-        when(mapper.mapRequestDtoToEmployee(requestDto)).thenReturn(employee);
-        when(employeeRepository.save(employee)).thenReturn(savedEmployee);
-        when(mapper.mapEmployeeToResponseDto(savedEmployee)).thenReturn(responseDto);
-
-        EmployeeResponseDto result = employeeService.createEmployee(requestDto);
+        CreateEmployeeResponseDto result = employeeService.createEmployee(requestDto);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
@@ -74,8 +68,6 @@ public class EmployeeServiceTest {
         assertEquals("Engineering", result.getDepartment());
         assertEquals(BigDecimal.valueOf(50000), result.getSalary());
 
-        verify(mapper).mapRequestDtoToEmployee(requestDto);
-        verify(employeeRepository).save(employee);
-        verify(mapper).mapEmployeeToResponseDto(savedEmployee);
+        verify(employeeRepository).save(ArgumentMatchers.any(Employee.class));
     }
 }

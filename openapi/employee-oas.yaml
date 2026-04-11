@@ -1,0 +1,137 @@
+openapi: 3.1.0
+info:
+  title: Employees API
+  description: APIs to manage employees.
+  version: 1.0.0
+
+servers:
+  - url: https://techshowcase.dev/
+    description: Production env
+  - url: http://localhost:8080
+    description: local env
+
+tags:
+  - name: Employee
+    description: Operations to manage employees.
+
+paths:
+  /api/v1/employees:
+    post:
+      tags:
+        - Employee
+      summary: Create an employee
+      description: Create an employee with provided details.
+      operationId: createEmployee
+      requestBody:
+        description: Payload with employee detail
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployeeRequest'
+      responses:
+        '201':
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEmployeeResponse'
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateEmployeeRequest:
+      type: object
+      description: Employee detail to be created.
+      required:
+        - name
+        - employeeCode
+        - department
+        - email
+        - salary
+        - dateOfJoining
+      properties:
+        name:
+          type: string
+          description: Name of the employee
+        employeeCode:
+          type: string
+          description: code of the employee
+          example: code123
+        department:
+          type: string
+          description: department of the employee
+          example: IT
+        email:
+          type: string
+          description: email id of the employee
+          example: code123
+        salary:
+          type: number
+          description: salary of the employee
+          example: 4000.00
+        dateOfJoining:
+          type: string
+          format: date-time
+          description: joining date of the employee
+    CreateEmployeeResponse:
+      type: object
+      description: Employee detail to be created.
+      properties:
+        id:
+          type: long
+        name:
+          type: string
+          description: Name of the employee
+        employeeCode:
+          type: string
+          description: code of the employee
+          example: code123
+        department:
+          type: string
+          description: department of the employee
+        email:
+          type: string
+          description: email id of the employee
+          example: code123
+        salary:
+          type: number
+          description: salary of the employee
+          example: 4000.00
+        dateOfJoining:
+          type: string
+          format: date-time
+          description: joining date of the employee
+        createdAt:
+          type: string
+          format: date-time
+          description: creation date of the employee
+        updatedAt:
+          type: string
+          format: date-time
+          description: date that the employee last updated
+    ErrorResponse:
+      type: object
+      description: exception detail
+      properties:
+        message:
+          type: string
+          description: error detail
+        errors:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time

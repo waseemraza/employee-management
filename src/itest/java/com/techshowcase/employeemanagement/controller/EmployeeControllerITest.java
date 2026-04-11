@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EmployeeControllerITest extends EmployeeManagementApplicationTest {
 
     @Test
-    void createEmployee_Success() throws Exception {
+    void createAndGetEmployee_Success() throws Exception {
 
         final EmployeeRequestDto payload = EmployeeTestDataHelper.getEmployeeRequestDto();
 
@@ -25,17 +25,6 @@ public class EmployeeControllerITest extends EmployeeManagementApplicationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", Matchers.equalTo("John Doe")))
                 .andExpect(jsonPath("$.dateOfJoining", Matchers.equalTo("2026-05-02T09:00:00Z")));
-    }
-
-    @Test
-    void searchEmployees_ReturnsSearchedEmployee() throws Exception {
-
-        final EmployeeRequestDto payload = EmployeeTestDataHelper.getEmployeeRequestDto();
-
-        mockMvc.perform(post("/api/v1/employees")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/employees")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -44,4 +33,5 @@ public class EmployeeControllerITest extends EmployeeManagementApplicationTest {
                 .andExpect(jsonPath("$.content[0].name", Matchers.equalTo("John Doe")))
                 .andExpect(jsonPath("$.content[0].employeeCode", Matchers.equalTo("EMP001")));
     }
+
 }
