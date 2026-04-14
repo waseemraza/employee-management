@@ -49,6 +49,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+    get:
+      tags:
+        - Employee
+      summary: Search employees
+      description: Search one or more employees
+      operationId: searchEmployees
+      x-spring-paginated: true
+      parameters:
+      - in: query
+        description: Parameters to search employee(s)
+        name: employeeSearchParams
+        schema:
+          $ref: ./parameters/EmployeeSearchParams.yaml
+      responses:
+        '200':
+          description: Employee found successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of employees found
+                items:
+                 $ref: '#/components/schemas/CreateEmployeeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
 components:
   schemas:
     CreateEmployeeRequest:

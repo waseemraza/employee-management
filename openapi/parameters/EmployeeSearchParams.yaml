@@ -1,0 +1,15 @@
+type: object
+description: Search parameters that can be used to search employee(s).
+properties:
+  employeeCode:
+    description: Code of the employee
+    type: string
+  name:
+    description: Code of the employee
+    type: string
+  email:
+    description: Code of the employee
+    type: string
+  department:
+    description: Code of the employee
+    type: string
