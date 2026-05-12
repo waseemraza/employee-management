@@ -20,11 +20,11 @@ public class EmployeeController {
 
     private EmployeeService employeeService;
 
-    @GetMapping("/api/v1/employees")
+    /*@GetMapping("/api/v1/employees")
     public Page<EmployeeResponseDto> searchEmployees(final EmployeeSearchParamsDto searchParams,
                                                      final Pageable pageable) {
         return employeeService.searchEmployees(searchParams, pageable);
-    }
+    }*/
 
     @PutMapping("/api/v1/employees/{id}")
     public ResponseEntity<EmployeeResponseDto> updateEmployee(

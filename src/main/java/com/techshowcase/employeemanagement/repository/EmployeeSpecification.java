@@ -1,6 +1,6 @@
 package com.techshowcase.employeemanagement.repository;
 
-import com.techshowcase.employeemanagement.dto.EmployeeSearchParamsDto;
+import com.techshowcase.api.model.EmployeeSearchParamsDto;
 import com.techshowcase.employeemanagement.entity.Employee;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;

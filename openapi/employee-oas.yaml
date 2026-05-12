@@ -61,7 +61,7 @@ paths:
         description: Parameters to search employee(s)
         name: employeeSearchParams
         schema:
-          $ref: ./parameters/EmployeeSearchParams.yaml
+          $ref: '#/components/schemas/EmployeeSearchParams'
       responses:
         '200':
           description: Employee found successfully
@@ -85,9 +85,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-
 components:
   schemas:
+    EmployeeSearchParams:
+      type: object
+      description: Search parameters that can be used to search employee(s).
+      properties:
+        id:
+          type: long
+        employeeCode:
+          description: Code of the employee
+          type: string
+        name:
+          description: Name of the employee
+          type: string
+        email:
+          description: Email of the employee
+          type: string
+        department:
+          description: Department of the employee
+          type: string
     CreateEmployeeRequest:
       type: object
       description: Employee detail to be created.

@@ -24,11 +24,11 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper mapper; // replace manual mapping with mapstruct lib
 
-    public Page<EmployeeResponseDto> searchEmployees(final EmployeeSearchParamsDto searchParams,
+    /*public Page<EmployeeResponseDto> searchEmployees(final EmployeeSearchParamsDto searchParams,
                                                      final Pageable pageable) {
         return employeeRepository.findAll(EmployeeSpecification.fromSearchParams(searchParams), pageable)
                 .map(mapper::mapToResponseDto);
-    }
+    }*/
 
     public EmployeeResponseDto updateEmployee(final Long id, final EmployeeRequestDto requestDto) {
         final Employee existing = employeeRepository.findById(id)

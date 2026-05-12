@@ -123,6 +123,8 @@ openApiGenerate {
 	generatorName = "spring"
 	inputSpec.set("$rootDir/openapi/employee-oas.yaml") // path to spec file
 	outputDir.set(layout.buildDirectory.dir("generated").get().asFile.path)
+	// Override built-in JavaSpring mustache templates (e.g. returnTypes.mustache to return Page<> for x-spring-paginated operations).
+	templateDir.set("$rootDir/openapi/templates/JavaSpring")
 	apiPackage.set("com.techshowcase.api")
 	modelPackage = "com.techshowcase.api.model"
 	modelNameSuffix.set("Dto")

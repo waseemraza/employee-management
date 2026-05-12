@@ -2,7 +2,7 @@ package com.techshowcase.employeemanagement.service;
 
 import com.techshowcase.api.model.CreateEmployeeRequestDto;
 import com.techshowcase.api.model.CreateEmployeeResponseDto;
-import com.techshowcase.employeemanagement.dto.EmployeeSearchParamsDto;
+import com.techshowcase.api.model.EmployeeSearchParamsDto;
 import com.techshowcase.employeemanagement.entity.Employee;
 import com.techshowcase.employeemanagement.mapper.EmployeeMapper;
 import com.techshowcase.employeemanagement.repository.EmployeeRepository;
